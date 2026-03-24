@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipo ABCJS Inactivo</title>
+
+    <!--
+      Este archivo es una referencia tecnica de la prueba ABCJS.
+      No esta conectado al sitio principal (index.html), por lo tanto no afecta produccion.
+      Puedes abrirlo manualmente cuando quieras evaluar el prototipo.
+    -->
+
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.3/dist/abcjs-basic-min.js"></script>
+
+    <style>
+        :root {
+            --bg: #121212;
+            --panel: #1c1c1c;
+            --line: rgba(255,255,255,0.12);
+            --text: #f1f1f1;
+            --muted: #bcbcbc;
+            --btn: #2b2b2b;
+            --btn-hover: #3a3a3a;
+            --accent: #d2b48c;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at top, #202020 0%, #121212 55%, #0b0b0b 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .shell {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .title {
+            margin: 0 0 8px;
+            font-size: 1.6rem;
+            color: var(--accent);
+        }
+
+        .subtitle {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: var(--text);
+            background: var(--btn);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn:hover { background: var(--btn-hover); }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .abc-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px;
+            background: rgba(0,0,0,0.25);
+        }
+
+        .abc-current-note {
+            margin-right: auto;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.08);
+            font-size: 0.9rem;
+        }
+
+        .abc-viewer-wrap {
+            overflow: auto;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #0f0f0f;
+            padding: 12px;
+        }
+
+        .abc-viewer {
+            background: #ffffff;
+            color: #111111;
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 260px;
+            transform-origin: top center;
+            transition: transform .15s ease;
+        }
+
+        .abc-viewer svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .abc-viewer .abcjs-staff,
+        .abc-viewer .abcjs-note,
+        .abc-viewer .abcjs-bar,
+        .abc-viewer .abcjs-clef,
+        .abc-viewer .abcjs-key-signature,
+        .abc-viewer .abcjs-time-signature,
+        .abc-viewer .abcjs-rest,
+        .abc-viewer .abcjs-lyric,
+        .abc-viewer .abcjs-title,
+        .abc-viewer .abcjs-meta-top,
+        .abc-viewer .abcjs-chord {
+            fill: #111111 !important;
+            stroke: #111111 !important;
+            opacity: 1 !important;
+        }
+
+        .abc-viewer .abcjs-cursor-line {
+            stroke: #d43f2f;
+            stroke-width: 2;
+            opacity: 0.95;
+        }
+
+        .note {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <h1 class="title">Prototipo ABCJS (Inactivo en produccion)</h1>
+        <p class="subtitle">Archivo unico de referencia: libreria, estructura, estilo y logica Play/Stop/Restart con notas sobre el pentagrama.</p>
+
+        <div class="actions">
+            <button id="render-btn" class="btn" type="button">Renderizar prototipo</button>
+            <button id="clear-btn" class="btn" type="button">Limpiar</button>
+        </div>
+
+        <section class="panel">
+            <div class="abc-toolbar">
+                <span id="abc-current-note" class="abc-current-note">Nota: -</span>
+                <button id="abc-play" class="btn" type="button">Play</button>
+                <button id="abc-restart" class="btn" type="button">Restart</button>
+                <button id="abc-zoom-out" class="btn" type="button">A-</button>
+                <button id="abc-zoom-in" class="btn" type="button">A+</button>
+                <button id="abc-reset" class="btn" type="button">Reset</button>
+            </div>
+
+            <div class="abc-viewer-wrap">
+                <div id="abc-viewer" class="abc-viewer"></div>
+            </div>
+
+            <p class="note">
+                Este archivo no esta referenciado desde index.html, por lo tanto no modifica tu web desplegada.
+                Solo es un respaldo tecnico para futuras iteraciones.
+            </p>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            const abcViewer = document.getElementById("abc-viewer");
+            const abcCurrentNote = document.getElementById("abc-current-note");
+            const renderBtn = document.getElementById("render-btn");
+            const clearBtn = document.getElementById("clear-btn");
+            const playBtn = document.getElementById("abc-play");
+            const restartBtn = document.getElementById("abc-restart");
+            const zoomOutBtn = document.getElementById("abc-zoom-out");
+            const zoomInBtn = document.getElementById("abc-zoom-in");
+            const resetBtn = document.getElementById("abc-reset");
+
+            let zoom = 1;
+            let visualObj = null;
+            let callbacks = null;
+            let cursorLine = null;
+            let isPlaying = false;
+
+            const abcNotation = [
+                "X:1",
+                "T:Carinito (Borrador Referencia)",
+                "C:Gabriel Barreto H.",
+                "M:4/4",
+                "L:1/8",
+                "Q:1/4=108",
+                "K:D",
+                "V:1 clef=treble",
+                "P:Intro",
+                "|: \"La\"A2 \"Do#\"c2 \"Re\"d2 \"Fa#\"f2 | \"Mi\"e2 \"Fa#\"f2 \"Mi\"e2 \"Re\"d2 |",
+                "   \"La\"A2 \"Do#\"c2 \"Re\"d2 \"Fa#\"f2 | \"Mi\"e2 \"Re\"d2 \"Do#\"c2 \"La\"A2 :|",
+                "P:Estrofa",
+                "|: \"Re\"d2 \"Fa#\"f2 \"La\"a2 \"Fa#\"f2 | \"Mi\"e2 \"Fa#\"f2 \"La\"a2 \"Sol\"g2 |",
+                "   \"Fa#\"f2 \"Mi\"e2 \"Re\"d2 \"Do#\"c2 | \"Si\"B2 \"Do#\"c2 \"Re\"d2 z2 |",
+                "   \"Re\"d2 \"Fa#\"f2 \"La\"a2 \"Fa#\"f2 | \"Mi\"e2 \"Fa#\"f2 \"La\"a2 \"Sol\"g2 |",
+                "   \"Fa#\"f2 \"Mi\"e2 \"Re\"d2 \"Do#\"c2 | \"Re\"d4 z4 :|"
+            ].join("\n");
+
+            function setCurrentNote(text) {
+                abcCurrentNote.textContent = "Nota: " + text;
+            }
+
+            function midiToSolfeo(midiNumber) {
+                if (typeof midiNumber !== "number" || !Number.isFinite(midiNumber)) return "-";
+                const names = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
+                const index = ((midiNumber % 12) + 12) % 12;
+                return names[index];
+            }
+
+            function createCursorLine() {
+                const svg = abcViewer.querySelector("svg");
+                if (!svg) return;
+
+                if (cursorLine && cursorLine.parentNode) cursorLine.parentNode.removeChild(cursorLine);
+
+                cursorLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                cursorLine.setAttribute("class", "abcjs-cursor-line");
+                cursorLine.setAttribute("x1", "0");
+                cursorLine.setAttribute("x2", "0");
+                cursorLine.setAttribute("y1", "0");
+                cursorLine.setAttribute("y2", "0");
+                cursorLine.style.display = "none";
+                svg.appendChild(cursorLine);
+            }
+
+            function updateCursor(ev) {
+                if (!ev || !cursorLine) return;
+                const left = Number(ev.left || 0);
+                const top = Number(ev.top || 0);
+                const height = Math.max(16, Number(ev.height || 60));
+                cursorLine.setAttribute("x1", String(left));
+                cursorLine.setAttribute("x2", String(left));
+                cursorLine.setAttribute("y1", String(top));
+                cursorLine.setAttribute("y2", String(top + height));
+                cursorLine.style.display = "block";
+            }
+
+            function ensureCallbacks() {
+                if (callbacks || !visualObj || !window.ABCJS || !window.ABCJS.TimingCallbacks) return;
+
+                callbacks = new window.ABCJS.TimingCallbacks(visualObj, {
+                    eventCallback: function (ev) {
+                        if (!ev) {
+                            isPlaying = false;
+                            playBtn.textContent = "Play";
+                            if (cursorLine) cursorLine.style.display = "none";
+                            return;
+                        }
+                        updateCursor(ev);
+
+                        if (Array.isArray(ev.midiPitches) && ev.midiPitches.length > 0 && typeof ev.midiPitches[0].pitch === "number") {
+                            setCurrentNote(midiToSolfeo(ev.midiPitches[0].pitch));
+                        }
+                    }
+                });
+            }
+
+            function renderAbc() {
+                if (!window.ABCJS) return;
+                abcViewer.innerHTML = "";
+                const visualObjs = window.ABCJS.renderAbc("abc-viewer", abcNotation, {
+                    responsive: "resize",
+                    add_classes: true,
+                    staffwidth: 980
+                });
+                visualObj = Array.isArray(visualObjs) ? visualObjs[0] : null;
+                setCurrentNote("-");
+                zoom = 1;
+                abcViewer.style.transform = "scale(1)";
+                createCursorLine();
+                callbacks = null;
+                ensureCallbacks();
+                isPlaying = false;
+                playBtn.textContent = "Play";
+            }
+
+            function pausePlayback() {
+                if (!callbacks) return;
+                try { callbacks.pause(); } catch (e) {}
+                isPlaying = false;
+                playBtn.textContent = "Play";
+            }
+
+            function restartPlayback() {
+                if (!callbacks) return;
+                pausePlayback();
+                try {
+                    callbacks.reset();
+                } catch (e) {
+                    try { callbacks.setProgress(0, "percent"); } catch (ignore) {}
+                }
+                if (cursorLine) cursorLine.style.display = "none";
+                setCurrentNote("-");
+            }
+
+            renderBtn.addEventListener("click", renderAbc);
+
+            clearBtn.addEventListener("click", function () {
+                pausePlayback();
+                abcViewer.innerHTML = "";
+                visualObj = null;
+                callbacks = null;
+                cursorLine = null;
+                setCurrentNote("-");
+                playBtn.textContent = "Play";
+            });
+
+            playBtn.addEventListener("click", function () {
+                if (!visualObj) renderAbc();
+                ensureCallbacks();
+                if (!callbacks) return;
+
+                if (isPlaying) {
+                    pausePlayback();
+                    return;
+                }
+
+                isPlaying = true;
+                playBtn.textContent = "Stop";
+                callbacks.start();
+            });
+
+            restartBtn.addEventListener("click", restartPlayback);
+
+            zoomOutBtn.addEventListener("click", function () {
+                zoom = Math.max(0.75, zoom - 0.1);
+                abcViewer.style.transform = "scale(" + zoom + ")";
+            });
+
+            zoomInBtn.addEventListener("click", function () {
+                zoom = Math.min(1.6, zoom + 0.1);
+                abcViewer.style.transform = "scale(" + zoom + ")";
+            });
+
+            resetBtn.addEventListener("click", function () {
+                zoom = 1;
+                abcViewer.style.transform = "scale(1)";
+            });
+        })();
+    </script>
+</body>
+</html>
