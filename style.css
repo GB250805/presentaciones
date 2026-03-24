@@ -11,6 +11,11 @@
     --color-btn-hover: #e0c29f;
 }
 
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* EFECTO 1: Scroll Suave Global */
 html {
     scroll-behavior: smooth;
@@ -306,17 +311,43 @@ a { text-decoration: none; color: inherit; transition: .2s; }
     position: relative;
 }
 
+.pdf-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 12px;
+    background: rgba(10, 10, 10, 0.88);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pdf-title {
+    margin: 0;
+    color: #f0e6d8;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .pdf-container {
     flex: 1;
     width: 100%;
     height: 100%;
     overflow: hidden;
+    position: relative;
 }
 
 .pdf-container iframe {
     width: 100%;
     height: 100%;
     border: none;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.pdf-container.loading iframe {
+    opacity: 0;
 }
 
 .pdf-back-btn {
@@ -338,4 +369,33 @@ a { text-decoration: none; color: inherit; transition: .2s; }
     color: var(--color-dark-bg);
     transform: translateY(-1px);
     box-shadow: 0 5px 10px rgba(210, 180, 140, 0.2);
+}
+
+.pdf-status,
+.pdf-error {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(15, 15, 15, 0.9);
+    color: #f6f6f6;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    max-width: 90%;
+    text-align: center;
+}
+
+.pdf-error {
+    display: none;
+    border-color: rgba(255, 120, 120, 0.45);
+}
+
+.pdf-modal.ready .pdf-status {
+    display: none;
+}
+
+.pdf-modal.has-error .pdf-error {
+    display: block;
 }

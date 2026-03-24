@@ -252,10 +252,17 @@
     <!-- MODAL PARA VISUALIZAR PDF EN FULLSCREEN -->
     <div id="pdf-modal" class="pdf-modal">
         <div class="pdf-modal-content">
+            <div class="pdf-topbar">
+                <h4 id="doc-title" class="pdf-title">Partitura</h4>
+                <button class="pdf-back-btn" onclick="cerrarDoc()">Volver</button>
+            </div>
             <div class="pdf-container">
                 <iframe id="pdf-viewer" src="" type="application/pdf"></iframe>
             </div>
-            <button class="pdf-back-btn" onclick="cerrarDoc()">Volver</button>
+            <div id="pdf-status" class="pdf-status">Cargando partitura...</div>
+            <div id="pdf-error" class="pdf-error" aria-live="polite">
+                No se pudo cargar la partitura. Intenta nuevamente.
+            </div>
         </div>
     </div>
 
@@ -273,75 +280,7 @@
         </div>
     </footer>
 
-    <script>
-        // Animación simple CSS en JS para el Hero
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = `
-            @keyframes fadeInUp {
-                from { opacity: 0; transform: translateY(20px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(styleSheet);
-
-        // FUNCIONES PARA ABRIR Y CERRAR GOOGLE DOCS EN PANTALLA COMPLETA
-        function abrirDoc(titulo, enlaceGoogleDoc) {
-            const modal = document.getElementById('pdf-modal');
-            const docViewer = document.getElementById('pdf-viewer');
-            
-            // Si el enlace no es válido, mostrar alerta
-            if (enlaceGoogleDoc.includes('PonerLinkDeGoogleDoc')) {
-                alert('Este documento aún no está configurado. Por favor, contacta al administrador.');
-                return;
-            }
-            
-            // Cambiar la URL del Google Doc
-            docViewer.src = enlaceGoogleDoc;
-            
-            // Mostrar modal en pantalla completa
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function cerrarDoc() {
-            const modal = document.getElementById('pdf-modal');
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Cerrar modal al presionar ESC
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                cerrarDoc();
-            }
-        });
-
-        // Scroll Reveal de tarjetas
-        document.addEventListener("DOMContentLoaded", function() {
-            const tarjetas = document.querySelectorAll('.score-card');
-            
-            // Añadir estilos iniciales para animación
-            tarjetas.forEach(t => {
-                t.style.opacity = '0';
-                t.style.transform = 'translateY(30px)';
-                t.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            });
-
-            const observador = new IntersectionObserver((entradas) => {
-                entradas.forEach((entrada, index) => {
-                    if (entrada.isIntersecting) {
-                        setTimeout(() => {
-                            entrada.target.style.opacity = '1';
-                            entrada.target.style.transform = 'translateY(0)';
-                        }, index * 50); // Efecto cascada
-                        observador.unobserve(entrada.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            tarjetas.forEach(tarjeta => observador.observe(tarjeta));
-        });
-    </script>
+    <script src="app.js"></script>
 
 </body>
 </html>
