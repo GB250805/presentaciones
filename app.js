@@ -5,6 +5,7 @@
     const pdfContainer = document.querySelector(".pdf-container");
     const scoreGrid = document.querySelector(".score-grid");
     const sortSelect = document.getElementById("sort-select");
+    const searchInput = document.getElementById("search-input");
     const songsData = Array.isArray(window.SONGS_DATA) ? window.SONGS_DATA : [];
 
     let scrollY = 0;
@@ -93,6 +94,26 @@
         });
     }
 
+    function normalizeText(text) {
+        return (text || "")
+            .toString()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function filterSongs(list, query) {
+        const q = normalizeText(query).trim();
+        if (!q) return list;
+
+        return list.filter(function (song) {
+            return (
+                normalizeText(song.title).includes(q) ||
+                normalizeText(song.artist).includes(q)
+            );
+        });
+    }
+
     function crearTarjetaCancion(cancion) {
         const card = document.createElement("div");
         card.className = "score-card";
@@ -151,9 +172,18 @@
         if (!scoreGrid) return;
 
         const orden = sortSelect ? sortSelect.value : "title-asc";
-        const sortedSongs = sortSongs(songsData, orden);
+        const consulta = searchInput ? searchInput.value : "";
+        const sortedSongs = sortSongs(filterSongs(songsData, consulta), orden);
 
         scoreGrid.innerHTML = "";
+
+        if (sortedSongs.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "no-results";
+            empty.textContent = "No se encontraron canciones.";
+            scoreGrid.appendChild(empty);
+            return;
+        }
 
         sortedSongs.forEach(function (cancion) {
             scoreGrid.appendChild(crearTarjetaCancion(cancion));
@@ -223,6 +253,10 @@
     document.addEventListener("DOMContentLoaded", function () {
         if (sortSelect) {
             sortSelect.addEventListener("change", renderSongs);
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener("input", renderSongs);
         }
 
         renderSongs();
