@@ -149,9 +149,14 @@ window.SONGS_DATA = [
     artist: "Bareto",
     url: "https://docs.google.com/document/d/1qGr2v4ZY7HulmjDQPPec_0CWZNYCGU7WK_UxyHvJ_gQ/edit?usp=sharing",
   },
-    {
+  {
     title: "Manuel Santillán, el León",
     artist: "Los Fabulosos Cadillacs",
     url: "https://docs.google.com/document/d/1eY47fQ2xfR5pPrCQQh3RRMA64MOmjok38Apns32oRjk/edit?usp=sharing",
+  },
+  {
+    title: "Te Quiero Comer la Boca",
+    artist: "La Mosca Tsé Tsé",
+    url: "https://docs.google.com/document/d/1m131qaP-b-WRxZHiGWChMFhMd7JuxFxMlcXLzhHp0vU/edit?usp=sharing",
   },
 ];
