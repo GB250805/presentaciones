@@ -6,6 +6,7 @@
     const scoreGrid = document.querySelector(".score-grid");
     const sortSelect = document.getElementById("sort-select");
     const searchInput = document.getElementById("search-input");
+    const songCount = document.getElementById("song-count");
     const songsData = Array.isArray(window.SONGS_DATA) ? window.SONGS_DATA : [];
 
     let scrollY = 0;
@@ -168,13 +169,24 @@
         });
     }
 
+        function actualizarContador(mostradas, total) {
+        if (!songCount) return;
+
+        const palabra = total === 1 ? "canción" : "canciones";
+
+        songCount.textContent =
+            mostradas === total
+                ? total + " " + palabra
+                : "Mostrando " + mostradas + " de " + total + " " + palabra;
+    }
+
     function renderSongs() {
         if (!scoreGrid) return;
 
         const orden = sortSelect ? sortSelect.value : "title-asc";
         const consulta = searchInput ? searchInput.value : "";
         const sortedSongs = sortSongs(filterSongs(songsData, consulta), orden);
-
+        actualizarContador(sortedSongs.length, songsData.length);
         scoreGrid.innerHTML = "";
 
         if (sortedSongs.length === 0) {
