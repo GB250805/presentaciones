@@ -41,13 +41,19 @@
         <div class="container">
             <h3>MI REPERTORIO</h3> 
             <div class="sorting-controls">
-                <label for="sort-select">Ordenar por:</label>
-                <select id="sort-select" aria-label="Ordenar canciones">
-                    <option value="title-asc">Nombre (A-Z)</option>
-                    <option value="title-desc">Nombre (Z-A)</option>
-                    <option value="artist-asc">Artista (A-Z)</option>
-                    <option value="artist-desc">Artista (Z-A)</option>
-                </select>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="search" id="search-input" placeholder="Buscar canción o artista..." aria-label="Buscar canción" autocomplete="off">
+                </div>
+                <div class="sort-box">
+                    <label for="sort-select">Ordenar por:</label>
+                    <select id="sort-select" aria-label="Ordenar canciones">
+                        <option value="title-asc">Nombre (A-Z)</option>
+                        <option value="title-desc">Nombre (Z-A)</option>
+                        <option value="artist-asc">Artista (A-Z)</option>
+                        <option value="artist-desc">Artista (Z-A)</option>
+                    </select>
+                </div>
             </div>
             <div class="score-grid">
             </div> 
@@ -63,7 +69,10 @@
             <div class="pdf-container">
                 <iframe id="pdf-viewer" src="" type="application/pdf"></iframe>
             </div>
-            <div id="pdf-status" class="pdf-status">Cargando partitura...</div>
+            <div id="pdf-status" class="pdf-status">
+                <div class="spinner"></div>
+                <span>Cargando partitura...</span>
+            </div>
             <div id="pdf-error" class="pdf-error" aria-live="polite">
                 No se pudo cargar la partitura. Intenta nuevamente.
             </div>
