@@ -218,6 +218,13 @@ a {
   box-shadow: 0 0 0 2px rgba(210, 180, 140, 0.2);
 }
 
+.song-count {
+  text-align: center;
+  color: var(--color-gold-accent);
+  font-size: 0.95rem;
+  margin: -10px 0 24px;
+}
+
 .sort-box {
   display: flex;
   align-items: center;
